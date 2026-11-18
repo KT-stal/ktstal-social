@@ -45,7 +45,7 @@ class Publish(unittest.TestCase):
         calls = []
         def api(path, data=None, method=None, params=None):
             calls.append(path)
-            if path == 'me/media': return {'data': []}
+            if path == '42/media': return {'data': []}
             if path.endswith('media_publish'): return {'id': '77'}
             return {'permalink': 'https://i/p/77'}
         with mock.patch.object(P, 'api', side_effect=api), mock.patch.object(P, 'container', return_value='c1'):
