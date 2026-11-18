@@ -7,13 +7,14 @@
     python3 bot/post_ig.py --check <id>      створити контейнер без публікації
     python3 bot/post_ig.py --publish <id>    опублікувати одну позицію зараз
     python3 bot/post_ig.py --run             опублікувати позицію, якій настав час (cron)
+    python3 bot/post_ig.py --story <файл>…   опублікувати сторіс (для хайлайтів)
 
 Токен і id акаунта — лише зі змінних IG_TOKEN, IG_USER_ID (секрети репозиторію).
 Запобіжники: не більше одного допису на київську добу; перед публікацією звіряємо
 останні дописи акаунта, щоб збій після media_publish не дав дубля; стан пишемо в
 queue.json одразу після публікації, workflow комітить його назад.
 """
-import sys, os, json, time, datetime, urllib.request, urllib.parse, urllib.error
+import sys, os, json, time, datetime, hashlib, urllib.request, urllib.parse, urllib.error
 from zoneinfo import ZoneInfo
 
 KYIV = ZoneInfo('Europe/Kyiv')
@@ -21,6 +22,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 QUEUE = os.path.join(ROOT, 'queue.json')
 BASE = 'https://graph.facebook.com/v23.0'   # ключ «Instagram API (єдиний вхід)» працює через граф Facebook з id акаунта
 WAIT_S = 600
+PAGES = 'https://kt-stal.github.io/ktstal-social/'
 
 
 def log(msg):
@@ -132,6 +134,14 @@ def main(argv=None):
         cid = container(by[a[1]]); print('контейнер готовий, не опубліковано:', cid); return
     if os.environ.get('ENABLED', '1') != '1': log('вимкнено (ENABLED != 1)'); return
     if a[0] == '--publish': publish(items, by[a[1]]); return
+    if a[0] == '--story':   # сторіс для хайлайтів: --story m/stories/<файл>.jpg ...; пауза між ними, щоб Meta не прийняла за спам
+        _, uid = env()
+        for n, rel in enumerate(a[1:]):
+            if n: time.sleep(int(os.environ.get('STORY_GAP_S', '240')))
+            v = hashlib.sha1(open(os.path.join(ROOT, rel), 'rb').read()).hexdigest()[:8]
+            cid = api(f'{uid}/media', {'media_type': 'STORIES', 'image_url': f'{PAGES}{rel}?v={v}'})['id']; wait_ready(cid)
+            log(f'сторіс {rel}: {api(f"{uid}/media_publish", {"creation_id": cid})["id"]}')
+        return
     if a[0] == '--run':
         x = due(items, now)
         if not x: log('нічого публікувати'); return
