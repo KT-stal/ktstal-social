@@ -9,6 +9,7 @@
     out[f] = await new Promise(r => { const fr = new FileReader(); fr.onload = () => r(fr.result); fr.readAsDataURL(b); });
   }
   window.name = 'KTSTORY:' + JSON.stringify(out);
+  if (parent !== window) parent.postMessage({ktstory: out}, '*');
   document.body.textContent = 'ready ' + Object.keys(out).length;
 })();
 </script>
