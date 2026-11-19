@@ -1,0 +1,14 @@
+<!doctype html><meta charset="utf-8"><title>carry</title>
+<script>
+// Переносить зображення сторіс в іншу вкладку через window.name (для хайлайтів у вебверсії Instagram).
+(async () => {
+  const files = (new URLSearchParams(location.search).get('f') || '').split(',').filter(Boolean);
+  const out = {};
+  for (const f of files) {
+    const b = await (await fetch('../m/stories/' + f)).blob();
+    out[f] = await new Promise(r => { const fr = new FileReader(); fr.onload = () => r(fr.result); fr.readAsDataURL(b); });
+  }
+  window.name = 'KTSTORY:' + JSON.stringify(out);
+  document.body.textContent = 'ready ' + Object.keys(out).length;
+})();
+</script>
