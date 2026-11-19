@@ -34,6 +34,22 @@
   "стан": "pending"
  },
  {
+  "id": "закріплений-03",
+  "тип": "carousel",
+  "час": "2026-11-20T09:00:00+02:00",
+  "підпис": "Найчастіше питання не «скільки коштує», а «як у вас це працює». Відповідаємо один раз, закріплюємо.\n\nНайшвидше — подзвонити у своє місто: Київ 067 626 49 19, Харків 067 005 75 87, Полтава 067 505 40 03. Є також Telegram-бот @Kt_stal_bot і Viber 067 433 22 83. Менеджер надсилає рахунок — на пошту, у Viber чи в M.E.Doc; безготівковий дійсний один день, бо ціна на метал рухається швидше за бухгалтерію. Платите як зручно: карткою онлайн, готівкою, терміналом водієві, безготівкою.\n\nПорізка: сортовий прокат ріжемо безкоштовно від 1 м під вашу машину чи проєкт. Лист у розмір не ріжемо — за кресленням є плазма, це окремо і з чергою. Оплатили заздалегідь — замовлення збираємо до вашого приїзду; перед виїздом уточніть, на якому складі позиція. Доставка — на узгоджений день, ціну кажемо наперед, після оплати подзвонимо узгодити. Дрібне — Новою Поштою.\n\nСубота робоча: Харків із 7:00, Київ і Полтава з 8:00.\n\nПодзвоніть у своє місто: номери на другому слайді.\n\n#КТСталь #металопрокат #доставкаметалу",
+  "urls": [
+   "https://kt-stal.github.io/ktstal-social/m/zakriplenyi-03/01.jpg?v=377a37b1",
+   "https://kt-stal.github.io/ktstal-social/m/zakriplenyi-03/02.jpg?v=13ebfab5",
+   "https://kt-stal.github.io/ktstal-social/m/zakriplenyi-03/03.jpg?v=035afaae",
+   "https://kt-stal.github.io/ktstal-social/m/zakriplenyi-03/04.jpg?v=102338e1",
+   "https://kt-stal.github.io/ktstal-social/m/zakriplenyi-03/05.jpg?v=3b146fbf",
+   "https://kt-stal.github.io/ktstal-social/m/zakriplenyi-03/06.jpg?v=345c514f",
+   "https://kt-stal.github.io/ktstal-social/m/zakriplenyi-03/07.jpg?v=197ec8ce"
+  ],
+  "стан": "pending"
+ },
+ {
   "id": "2026-11-19-можна-01",
   "тип": "carousel",
   "час": "2026-11-21T10:00:00+02:00",
@@ -57,7 +73,7 @@
    "https://kt-stal.github.io/ktstal-social/m/2026-11-21-istoriia-02/reel.mp4?v=3d2681d4"
   ],
   "стан": "pending",
-  "обкладинка_url": "https://kt-stal.github.io/ktstal-social/m/2026-11-21-istoriia-02/cover.jpg?v=c0e25a8e"
+  "обкладинка_url": "https://kt-stal.github.io/ktstal-social/m/2026-11-21-istoriia-02/cover.jpg?v=78ef995f"
  },
  {
   "id": "2026-11-26-вгадай-02",
@@ -68,7 +84,7 @@
    "https://kt-stal.github.io/ktstal-social/m/2026-11-26-vhadai-02/reel.mp4?v=0144e79d"
   ],
   "стан": "pending",
-  "обкладинка_url": "https://kt-stal.github.io/ktstal-social/m/2026-11-26-vhadai-02/cover.jpg?v=fc6adcaf"
+  "обкладинка_url": "https://kt-stal.github.io/ktstal-social/m/2026-11-26-vhadai-02/cover.jpg?v=499d797d"
  },
  {
   "id": "2026-11-28-резерв-метал-01",
@@ -108,7 +124,7 @@
    "https://kt-stal.github.io/ktstal-social/m/2026-12-05-deshevshe-02/reel.mp4?v=864c6bc4"
   ],
   "стан": "pending",
-  "обкладинка_url": "https://kt-stal.github.io/ktstal-social/m/2026-12-05-deshevshe-02/cover.jpg?v=ae8cfc8a"
+  "обкладинка_url": "https://kt-stal.github.io/ktstal-social/m/2026-12-05-deshevshe-02/cover.jpg?v=35f19a9b"
  },
  {
   "id": "2026-12-08-метал-03",
@@ -134,7 +150,7 @@
    "https://kt-stal.github.io/ktstal-social/m/2026-12-10-istoriia-04/reel.mp4?v=111150e2"
   ],
   "стан": "pending",
-  "обкладинка_url": "https://kt-stal.github.io/ktstal-social/m/2026-12-10-istoriia-04/cover.jpg?v=50ea85d2"
+  "обкладинка_url": "https://kt-stal.github.io/ktstal-social/m/2026-12-10-istoriia-04/cover.jpg?v=e01495f9"
  },
  {
   "id": "2026-12-12-дешевше-03",
