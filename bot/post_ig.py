@@ -143,6 +143,8 @@ def main(argv=None):
             log(f'сторіс {rel}: {api(f"{uid}/media_publish", {"creation_id": cid})["id"]}')
         return
     if a[0] == '--run':
+        # запобіжник власника 24.11.2026: публікуємо лише в день, який уранці перевірено на жалобу й обстріли (змінна CHECKED_DATE)
+        if os.environ.get('CHECKED_DATE', '') != now.date().isoformat(): log('день не перевірено (CHECKED_DATE != %s) — не публікую' % now.date().isoformat()); return
         x = due(items, now)
         if not x: log('нічого публікувати'); return
         try: publish(items, x)
