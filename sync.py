@@ -24,7 +24,7 @@ def main():
     out, keep = [], set()
     for x in src:
         o = old.get(x['id'])
-        if o and o.get('стан') in ('done', 'error'):
+        if o and o.get('стан') in ('done', 'error', 'skip'):
             out.append(o); continue
         sl = slug(x['id']); d = os.path.join(HERE, 'm', sl); os.makedirs(d, exist_ok=True); keep.add(sl)
         urls = []
