@@ -61,6 +61,9 @@ def save(items):
 def when(x): return datetime.datetime.fromisoformat(x['час'])
 
 
+MAX_PER_DAY = 2   # 26.11: власник — ролик щодня; у день із каруселлю до дати виходять два дописи
+
+
 def published_on(items, day):
     return [x for x in items if x.get('стан') == 'done' and x.get('опубліковано') and
             datetime.datetime.fromisoformat(x['опубліковано']).astimezone(KYIV).date() == day]
@@ -68,7 +71,7 @@ def published_on(items, day):
 
 def due(items, now):
     """Найстаріша неопублікована позиція, якій настав час; None, якщо сьогодні вже був допис."""
-    if published_on(items, now.astimezone(KYIV).date()): return None
+    if len(published_on(items, now.astimezone(KYIV).date())) >= MAX_PER_DAY: return None
     ready = [x for x in items if x.get('стан', 'pending') == 'pending' and when(x) <= now]
     return min(ready, key=when) if ready else None
 

@@ -17,8 +17,10 @@ class Due(unittest.TestCase):
         q = [item('b', '2026-11-19T12:30:00+02:00'), item('a', '2026-11-18T09:00:00+02:00'), item('c', '2026-11-21T09:00:00+02:00')]
         self.assertEqual(P.due(q, self.now)['id'], 'a')
 
-    def test_one_per_kyiv_day(self):
+    def test_two_per_kyiv_day_max(self):
         q = [item('a', '2026-11-18T09:00:00+02:00', 'done', '2026-11-20T09:01:00+02:00'), item('b', '2026-11-19T12:30:00+02:00')]
+        self.assertEqual(P.due(q, self.now)['id'], 'b')
+        q[1] = item('b', '2026-11-19T12:30:00+02:00', 'done', '2026-11-20T10:00:00+02:00'); q.append(item('c', '2026-11-19T13:00:00+02:00'))
         self.assertIsNone(P.due(q, self.now))
 
     def test_future_not_due(self):
