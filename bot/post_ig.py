@@ -8,6 +8,7 @@
     python3 bot/post_ig.py --publish <id>    опублікувати одну позицію зараз
     python3 bot/post_ig.py --run             опублікувати позицію, якій настав час (cron)
     python3 bot/post_ig.py --story <файл>…   опублікувати сторіс (для хайлайтів)
+    python3 bot/post_ig.py --fb <id>         продублювати вже опублікований допис на сторінку Facebook
 
 Токен і id акаунта — лише зі змінних IG_TOKEN, IG_USER_ID (секрети репозиторію).
 Запобіжники: не більше одного допису на київську добу; перед публікацією звіряємо
@@ -23,6 +24,7 @@ QUEUE = os.path.join(ROOT, 'queue.json')
 BASE = 'https://graph.facebook.com/v23.0'   # ключ «Instagram API (єдиний вхід)» працює через граф Facebook з id акаунта
 WAIT_S = 600
 PAGES = 'https://kt-stal.github.io/ktstal-social/'
+FB_PAGE = os.environ.get('FB_PAGE_ID', '').strip() or '1513391201857032'   # сторінка «КТ-Сталь · металобаза»; FB_PAGE_ID=0 вимикає дублювання
 
 
 def log(msg):
@@ -35,13 +37,13 @@ def env():
     return tok, uid
 
 
-def api(path, data=None, method=None, params=None):
-    tok, _ = env()
+def api(path, data=None, method=None, params=None, token=None, headers=None):
+    tok = token or env()[0]
     url = path if path.startswith('http') else f'{BASE}/{path.lstrip("/")}'
     if params: url += '?' + urllib.parse.urlencode(params)
     body = urllib.parse.urlencode(data).encode() if data is not None else None
     req = urllib.request.Request(url, data=body, method=method or ('POST' if body else 'GET'),
-                                 headers={'Authorization': f'Bearer {tok}'})
+                                 headers={'Authorization': f'Bearer {tok}', **(headers or {})})
     try:
         with urllib.request.urlopen(req, timeout=120) as r: return json.loads(r.read().decode())
     except urllib.error.HTTPError as e:
@@ -104,12 +106,44 @@ def already_live(x):
     return None
 
 
+def fb_post(x):
+    """Той самий допис на сторінку Facebook. Повертає (id, посилання). Ключ сторінки беремо з того ж IG_TOKEN."""
+    pt = api(FB_PAGE, params={'fields': 'access_token'})['access_token']
+    P = lambda path, data=None, **kw: api(path, data, token=pt, **kw)
+    if x['тип'] == 'reel':
+        vid = P(f'{FB_PAGE}/video_reels', {'upload_phase': 'start'})['video_id']
+        api(f'https://rupload.facebook.com/video-upload/v23.0/{vid}', {}, method='POST',
+            headers={'Authorization': f'OAuth {pt}', 'file_url': x['urls'][0]})
+        P(f'{FB_PAGE}/video_reels', {'upload_phase': 'finish', 'video_id': vid, 'video_state': 'PUBLISHED', 'description': x['підпис']})
+        return vid, f'https://www.facebook.com/reel/{vid}'
+    if x['тип'] == 'carousel':
+        ids = [P(f'{FB_PAGE}/photos', {'url': u, 'published': 'false'})['id'] for u in x['urls']]
+        data = {'message': x['підпис'], **{f'attached_media[{i}]': json.dumps({'media_fbid': m}) for i, m in enumerate(ids)}}
+        pid = P(f'{FB_PAGE}/feed', data)['id']
+    else:
+        r = P(f'{FB_PAGE}/photos', {'url': x['urls'][0], 'caption': x['підпис']}); pid = r.get('post_id') or r['id']
+    try: link = P(pid, params={'fields': 'permalink_url'}).get('permalink_url')
+    except Exception: link = None
+    return pid, link or f'https://www.facebook.com/{pid}'
+
+
+def fb_mirror(items, x):
+    """Дублювання у Facebook ніколи не ламає Instagram: помилку лише записуємо в чергу."""
+    if FB_PAGE == '0' or x.get('fb_id'): return
+    try:
+        x['fb_id'], x['fb_посилання'] = fb_post(x); x.pop('fb_помилка', None)
+        log(f'{x["id"]}: Facebook {x["fb_посилання"]}')
+    except Exception as e:
+        x['fb_помилка'] = str(e)[:300]; log(f'{x["id"]}: Facebook не вдалося: {x["fb_помилка"]}')
+    save(items)
+
+
 def publish(items, x):
     live = already_live(x)
     if live:
         log(f'{x["id"]}: вже опубліковано раніше {live.get("permalink")} — лише позначаю')
         x.update(стан='done', media_id=live['id'], посилання=live.get('permalink'), опубліковано=live.get('timestamp') or datetime.datetime.now(KYIV).isoformat())
-        save(items); return x
+        save(items); fb_mirror(items, x); return x
     cid = container(x)
     _, uid = env()
     mid = api(f'{uid}/media_publish', {'creation_id': cid})['id']
@@ -117,6 +151,7 @@ def publish(items, x):
     try: x['посилання'] = api(mid, params={'fields': 'permalink'}).get('permalink'); save(items)
     except Exception as e: log(f'посилання не отримано: {e}')
     log(f'{x["id"]}: опубліковано {x.get("посилання") or mid}')
+    fb_mirror(items, x)
     return x
 
 
@@ -134,6 +169,10 @@ def main(argv=None):
         cid = container(by[a[1]]); print('контейнер готовий, не опубліковано:', cid); return
     if os.environ.get('ENABLED', '1') != '1': log('вимкнено (ENABLED != 1)'); return
     if a[0] == '--publish': publish(items, by[a[1]]); return
+    if a[0] == '--fb':
+        x = by[a[1]]
+        if x.get('стан') != 'done': raise SystemExit('спершу допис має вийти в Instagram')
+        fb_mirror(items, x); return
     if a[0] == '--story':   # сторіс для хайлайтів: --story m/stories/<файл>.jpg ...; пауза між ними, щоб Meta не прийняла за спам
         _, uid = env()
         for n, rel in enumerate(a[1:]):

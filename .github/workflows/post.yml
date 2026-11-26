@@ -26,6 +26,7 @@ jobs:
           IG_USER_ID: ${{ secrets.IG_USER_ID }}
           ENABLED: ${{ vars.ENABLED }}
           CHECKED_DATE: ${{ vars.CHECKED_DATE }}
+          FB_PAGE_ID: ${{ vars.FB_PAGE_ID }}
         run: python3 bot/post_ig.py ${{ github.event_name == 'schedule' && '--run' || inputs.args }}
       - name: save state
         if: always()

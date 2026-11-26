@@ -54,5 +54,19 @@ class Publish(unittest.TestCase):
         self.assertIn('42/media_publish', calls)
 
 
+
+class FbMirror(unittest.TestCase):
+    def test_failure_is_recorded_not_raised(self):
+        x = item('a', '2026-11-18T09:00:00+02:00', 'done')
+        with mock.patch.object(P, 'fb_post', side_effect=RuntimeError('boom')), mock.patch.object(P, 'save'):
+            P.fb_mirror([x], x)
+        self.assertEqual(x['fb_помилка'], 'boom'); self.assertNotIn('fb_id', x)
+
+    def test_not_posted_twice(self):
+        x = dict(item('a', '2026-11-18T09:00:00+02:00', 'done'), fb_id='1')
+        with mock.patch.object(P, 'fb_post') as f, mock.patch.object(P, 'save'):
+            P.fb_mirror([x], x)
+        f.assert_not_called()
+
 if __name__ == '__main__':
     unittest.main()
