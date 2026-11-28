@@ -1,0 +1,34 @@
+<!doctype html><html lang="uk"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow">
+<title>Поділитися · КТ-Сталь</title>
+<style>
+:root{--bg:#111110;--card:#1c1c19;--fg:#f2f1ea;--mute:#a09f93;--y:#ffd400;--line:#33332d}
+@media (prefers-color-scheme:light){:root{--bg:#f3f2ee;--card:#fff;--fg:#17170f;--mute:#6b6a5f;--line:#dddbd0}}
+body{margin:0;background:var(--bg);color:var(--fg);font:500 16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:420px;margin:0 auto;padding:24px 16px 48px;display:flex;flex-direction:column;gap:14px}
+h1{font-size:20px;margin:0;text-wrap:balance}p{margin:0;color:var(--mute);font-size:14px}
+video,img{width:100%;border-radius:14px;background:#000;display:block}
+button,a.b{font:700 17px system-ui,-apple-system,sans-serif;padding:14px 16px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--fg);cursor:pointer;text-align:center;text-decoration:none}
+#go{background:var(--y);color:#17170f;border-color:var(--y)}button:disabled{opacity:.6}
+</style></head><body><main>
+<h1 id="t">КТ-Сталь</h1><div id="m"></div>
+<button id="go" type="button">Поділитися</button>
+<button id="lnk" type="button">Поділитися посиланням</button>
+<button id="cp" type="button">Скопіювати посилання</button>
+<p id="st" role="status"></p>
+</main><script>
+const q=new URLSearchParams(location.search),slug=(q.get('s')||'').replace(/[^a-z0-9-]/g,''),kind=q.get('k')==='img'?'img':'reel',title=(q.get('n')||'КТ-Сталь').slice(0,120);
+const ig=/^https:\/\/(www\.)?instagram\.com\//.test(q.get('l')||'')?q.get('l'):'';
+const base=new URL('m/'+slug+'/',location.href).href,file=kind==='reel'?base+'reel.mp4':'',url=ig||file||location.href;
+const $=id=>document.getElementById(id),st=t=>{$('st').textContent=t};
+$('t').textContent=title;
+if(slug&&kind==='reel'){const v=document.createElement('video');v.src=file;v.controls=true;v.playsInline=true;v.preload='metadata';v.poster=base+'cover.jpg';$('m').append(v)}
+else if(slug){const i=document.createElement('img');i.alt=title;i.src=base+'cover.jpg';i.onerror=()=>i.remove();$('m').append(i)}
+if(!file)$('go').hidden=true;
+$('go').onclick=async()=>{const b=$('go');b.disabled=true;st('Готую файл ролика…');
+ try{const r=await fetch(file);if(!r.ok)throw new Error('файл недоступний');const f=new File([await r.blob()],'kt-stal-'+slug+'.mp4',{type:'video/mp4'});
+  if(navigator.canShare&&navigator.canShare({files:[f]})){st('');await navigator.share({files:[f],title})}
+  else if(navigator.share){st('');await navigator.share({title,url})}else st('Цей браузер не має системного меню «Поділитися». Скопіюй посилання.')}
+ catch(e){if(e&&e.name!=='AbortError')st('Не вийшло: '+(e.message||e)+'. Спробуй «Поділитися посиланням».')}b.disabled=false};
+$('lnk').onclick=async()=>{try{if(navigator.share)await navigator.share({title,url});else st('Цей браузер не має системного меню «Поділитися». Скопіюй посилання.')}catch(e){}};
+$('cp').onclick=async()=>{try{await navigator.clipboard.writeText(url);st('Посилання скопійовано.')}catch(e){st(url)}};
+</script></body></html>
